@@ -4,23 +4,25 @@ from sklearn.utils import shuffle
 
 def generate_csv(path):
     print("CSV being generated")
-    uniques = ["Dyskeratotic" , "Koilocytotic" , "Metaplastic" , "Parabasal" , "SuperficialIntermediate"]
-    dirs = ["train" , "test"]
+    uniques = ["NILM" , "ASC-US" , "ASC-H" , "LSIL" , "HSIL", "SCC"]
+    dirs = ["Train" , "Test"]
 
     """
             +-- train
-            |   +-- Dyskeratotic
-            |   +-- Koilocytotic
-            |   +-- Metaplastic
-            |   +-- Parabasal
-            |   +-- SuperficialIntermediate
+            |   +-- NILM
+            |   +-- ASC-US
+            |   +-- ASC-H
+            |   +-- LSIL
+            |   +-- HSIL
+            |   +-- SCC
 
             +-- test
-            |   +-- Dyskeratotic
-            |   +-- Koilocytotic
-            |   +-- Metaplastic
-            |   +-- Parabasal
-            |   +-- SuperficialIntermediate
+            |   +-- NILM
+            |   +-- ASC-US
+            |   +-- ASC-H
+            |   +-- LSIL
+            |   +-- HSIL
+            |   +-- SCC
 
     
     """
