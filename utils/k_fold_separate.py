@@ -1,8 +1,10 @@
 import tensorflow as tf 
+import tensorflow_addons as tfa
+from keras import backend as K
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import numpy as np 
 from matplotlib.pyplot import imread
-from sklearn.metrics import confusion_matrix , accuracy_score
+from sklearn.metrics import confusion_matrix , accuracy_score, roc_auc_score
 from sklearn.metrics import precision_score, recall_score, f1_score
 from utils.create_model import create_model
 from utils.fuzzy_dist_ensemble import fuzzy_dist 
@@ -15,17 +17,18 @@ from utils.fuzzy_dist_ensemble import fuzzy_dist
 def encode_y(y):
   Y = []
   for i in y : 
-    if(i == "Dyskeratotic" ):
+    if(i == "NILM" ):
       Y.append(0)
-    elif(i == "Koilocytotic" ):
+    elif(i == "ASC-US" ):
       Y.append(1)
-    if(i == "Metaplastic" ):
+    if(i == "ASC-H" ):
       Y.append(2)
-    if(i == "Parabasal" ):
+    if(i == "LSIL" ):
       Y.append(3)
-    if(i == "SuperficialIntermediate" ):
+    if(i == "HSIL" ):
       Y.append(4)
-      
+    if(i == "SCC" ):
+      Y.append(5)
   return  np.array(Y).astype("float32")          
 
 # convert file paths info nums 
@@ -71,10 +74,23 @@ def k_fold_separate(x_train , y_train , x_val ,y_val , model_name1,model_name2,m
     print(model_name1)
     print()
 
+    #Metrics
+    def specificity(y_true, y_pred):
+      true_negatives = K.sum(K.round(K.clip((1-y_true) * (1-y_pred), 0, 1)))
+      possible_negatives = K.sum(K.round(K.clip(1-y_true, 0, 1)))
+      return true_negatives / (possible_negatives + K.epsilon())
 
-    
+    metrics_list = [tf.keras.metrics.CategoricalAccuracy(name='cat_accuracy'),
+                  tfa.metrics.F1Score(num_classes=6,threshold=None,average='macro',name = 'f1_score'),
+                  tf.keras.metrics.Recall(name='sensitivity/recall'),
+                  specificity,
+                  tf.keras.metrics.AUC(curve='ROC',name='AUC',multi_label=True,num_labels=6)]
+
+    # -----------------------------------Model 1 -------------------------------------------------
     model1 = create_model(model_name1)
-    
+
+
+
     # Compile the model
     model1.compile(loss='sparse_categorical_crossentropy',
                   optimizer= tf.keras.optimizers.Adam(learning_rate=lr, beta_1=0.9, beta_2=0.999, decay=0.0001),
@@ -121,12 +137,14 @@ def k_fold_separate(x_train , y_train , x_val ,y_val , model_name1,model_name2,m
     print('Recall Score(Class wise): ',recall_score(y_val,y_preds , average= None ), " mean- " , sum(recall_score(y_val,y_preds , average= None ))/n)
     print('F1 Score(Class wise): ',f1_score(y_val,y_preds , average= None), " mean- " , sum(f1_score(y_val,y_preds , average= None))/n)
     print('Conf Matrix Score(Class wise):\n ',confusion_matrix(y_val,y_preds ))    
+    print('AUC ROC(Class wise): ',roc_auc_score(y_val,y_preds , average= 'weighted'), " mean- " , sum(roc_auc_score(y_val,y_preds , average= 'weighted'))/n)
 
     y_preds = []
     print()
     print(model_name2)
     print()
 
+    # -----------------------------------Model 2 -------------------------------------------------
     model2 = create_model(model_name2)
     
     # Compile the model
@@ -177,12 +195,14 @@ def k_fold_separate(x_train , y_train , x_val ,y_val , model_name1,model_name2,m
     print('Recall Score(Class wise): ',recall_score(y_val,y_preds , average= None ), " mean- " , sum(recall_score(y_val,y_preds , average= None ))/n)
     print('F1 Score(Class wise): ',f1_score(y_val,y_preds , average= None), " mean- " , sum(f1_score(y_val,y_preds , average= None))/n)
     print('Conf Matrix Score(Class wise):\n ',confusion_matrix(y_val,y_preds ))   
+    print('AUC ROC(Class wise): ',roc_auc_score(y_val,y_preds , average= 'weighted'), " mean- " , sum(roc_auc_score(y_val,y_preds , average= 'weighted'))/n)
 
     y_preds = [] 
     print()
     print(model_name3)
     print()
 
+    # -----------------------------------Model 3 -------------------------------------------------
     model3 = create_model(model_name3)
     
     # Compile the model
@@ -234,7 +254,10 @@ def k_fold_separate(x_train , y_train , x_val ,y_val , model_name1,model_name2,m
     print('Recall Score(Class wise): ',recall_score(y_val,y_preds , average= None ), " mean- " , sum(recall_score(y_val,y_preds , average= None ))/n)
     print('F1 Score(Class wise): ',f1_score(y_val,y_preds , average= None), " mean- " , sum(f1_score(y_val,y_preds , average= None))/n)
     print('Conf Matrix Score(Class wise):\n ',confusion_matrix(y_val,y_preds ))   
-    
+    print('AUC ROC(Class wise): ',roc_auc_score(y_val,y_preds , average= 'weighted'), " mean- " , sum(roc_auc_score(y_val,y_preds , average= 'weighted'))/n)
+
+
+    # -------------------------------------------fuzzy distance ----------------------------------------
     ensem_pred=fuzzy_dist(preds1,preds2,preds3)
     print('Post Ensemble Accuracy Score: ',accuracy_score(y_val,ensem_pred))
 
@@ -242,3 +265,4 @@ def k_fold_separate(x_train , y_train , x_val ,y_val , model_name1,model_name2,m
     print('Post Ensemble Recall Score(Class wise): ',recall_score(y_val,ensem_pred , average= None ), " mean- " , sum(recall_score(y_val,ensem_pred , average= None ))/n)
     print('Post Ensemble F1 Score(Class wise): ',f1_score(y_val,ensem_pred , average= None), " mean- " , sum(f1_score(y_val,ensem_pred , average= None))/n)
     print('Post Ensemble Conf Matrix Score(Class wise):\n ',confusion_matrix(y_val,ensem_pred ))
+    print('Post EnsembleAUC ROC(Class wise): ',roc_auc_score(y_val,y_preds , average= 'weighted'), " mean- " , sum(roc_auc_score(y_val,ensem_pred , average= 'weighted'))/n)
