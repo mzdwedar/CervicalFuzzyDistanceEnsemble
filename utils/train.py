@@ -33,27 +33,29 @@ def normalize(input_image):
   input_image /= 255.0
   return input_image
 
-@tf.function
-def parse_function(datapoint):
-  """
-  return a resized and normalized pair of image and mask
-  args
-    datapoint: a single image and its corresponding segmentation mask
 
-  1. load the image from its path, decode it to jpeg, normalize it to [0,1]
-  2. decode the run-length encoding to pixels, then project the mask onto canvas with same size as image
-  3. resize both the image and segmentation mask, to math the input size of the network i.e (128,128)
-  """
-  # input_image, label = datapoint
+with tf.device('/cpu:0'):
+  @tf.function
+  def parse_function(datapoint):
+    """
+    return a resized and normalized pair of image and mask
+    args
+      datapoint: a single image and its corresponding segmentation mask
 
-  input_image = tf.io.read_file(datapoint[0])
-  input_image = tf.image.decode_image(input_image, expand_animations = False, channels=3)
-  input_image = tf.image.resize(input_image, (256, 256), method='nearest')
-  input_image = normalize(input_image)
+    1. load the image from its path, decode it to jpeg, normalize it to [0,1]
+    2. decode the run-length encoding to pixels, then project the mask onto canvas with same size as image
+    3. resize both the image and segmentation mask, to math the input size of the network i.e (128,128)
+    """
+    # input_image, label = datapoint
 
-  label = encode_y(datapoint[1])
+    input_image = tf.io.read_file(datapoint[0])
+    input_image = tf.image.decode_image(input_image, expand_animations = False, channels=3)
+    input_image = tf.image.resize(input_image, (256, 256), method='nearest')
+    input_image = normalize(input_image)
 
-  return input_image, label
+    label = encode_y(datapoint[1])
+
+    return input_image, label
 
 def evaluate_model(model, val_dataset, validation_batch, num_examples_val):
   X = []
