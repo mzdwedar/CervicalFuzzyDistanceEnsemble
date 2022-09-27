@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras.models import Model
 
-def create_model(model_name,IMG_SIZE = 256, output = 5):
+def create_model(model_name,IMG_SIZE = 256, output = 6):
 
 
     IMG_SHAPE = (IMG_SIZE, IMG_SIZE, 3)  # IMG_SIZE = 256

@@ -1,8 +1,7 @@
 import argparse
 import numpy as np
 from utils.generate_csv import generate_csv
-from utils.k_fold_splits import k_fold_splits
-from utils.k_fold_separate import train
+from utils.train import train
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--num_epochs', type=int, default = 70,
