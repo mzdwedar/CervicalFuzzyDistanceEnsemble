@@ -28,7 +28,8 @@ def generate_csv(path):
     """
     #Above is the expected directory structure
 
-    data = []
+    # data = []
+    data = {'Train':[], 'Test':[]}
     for dir in dirs :
         for unique in uniques:
             directory = path + "/" + dir + "/" + unique    #required path 
@@ -36,11 +37,13 @@ def generate_csv(path):
             for filename in os.listdir(directory):
                
                 paths = directory + "/" + filename  #required path 
-                data.append([ filename , paths  , unique])
+                data[dir].append([paths, unique])
 
-    df = pd.DataFrame(data, columns = ["filename" ,"path", "class"]) 
-    df = shuffle(df)
-    name = "csv_files/" + "Data-full"        #required path 
-    df.to_csv(name, index = False)
-    print("Generation Complete")
-    return df
+    train_df = pd.DataFrame(data['Train'], columns = ["path", "class"])
+    test_df = pd.DataFrame(data['Test'], columns=["path", "class"])
+
+    # df = shuffle(df)
+    # name = "csv_files/" + "Data-full"        #required path 
+    # df.to_csv(name, index = False)
+    # print("Generation Complete")
+    return train_df, test_df
