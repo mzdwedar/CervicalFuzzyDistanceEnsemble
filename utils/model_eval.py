@@ -17,12 +17,12 @@ def compute_metrics(model_name, Y, preds):
   print(f'{model_name} Conf Matrix Score(Class wise):\n ',confusion_matrix(Y, y_preds))    
   print(f'{model_name} AUC ROC(Class wise): ',roc_auc_score(Y, y_preds, average= 'weighted'), " mean- " , sum(roc_auc_score(Y,y_preds , average= 'weighted'))/n)
 
-def predict(model, dataset, num_examples, batch_size=16):
-  X = []
+def predict(model, dataset, num_examples, batch_size):
   
   ds = dataset.unbatch()
   ds = ds.batch(num_examples)  
-
+  
+  X = []
   for images, _ in ds.take(1):
     X = images.numpy()
 

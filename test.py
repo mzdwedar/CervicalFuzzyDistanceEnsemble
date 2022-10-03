@@ -10,7 +10,7 @@ import tensorflow as tf
 
 
 
-def test(test_paths, batch_size=16):
+def test(test_paths, batch_size):
     '''
     1. build data pipeline
     2. load the models
@@ -34,9 +34,9 @@ def test(test_paths, batch_size=16):
     model2 = load_hdf5_model("MobileNetV2")
     model3 = load_hdf5_model("InceptionResNetV2")
 
-    preds1 = predict(model1, test_dataset, batch_size, num_examples_test)
-    preds2 = predict(model2, test_dataset, batch_size, num_examples_test)
-    preds3 = predict(model3, test_dataset, batch_size, num_examples_test)
+    preds1 = predict(model1, test_dataset, num_examples_test, batch_size)
+    preds2 = predict(model2, test_dataset, num_examples_test, batch_size)
+    preds3 = predict(model3, test_dataset, num_examples_test, batch_size)
 
     ensem_preds = fuzzy_dist(preds1, preds2, preds3)    
     

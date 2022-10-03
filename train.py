@@ -1,6 +1,4 @@
 import tensorflow as tf 
-import tensorflow_addons as tfa
-import numpy as np 
 
 from utils.fuzzy_dist_ensemble import fuzzy_dist 
 from utils.generate_datasets import get_training_dataset
@@ -8,13 +6,11 @@ from utils.model_utils import create_model, save_model
 from utils.data_pipeline import parse_function, encode_y
 from utils.model_eval import predict, compute_metrics
 
-import pandas as pd
-
 import argparse
-import os
 
 
-def train(train_paths, val_paths, model_name1, model_name2, model_name3, NUM_EPOCHS=70, train_batch=16, validation_batch=16, lr=1e-4):
+
+def train(train_paths, val_paths, model_name1, model_name2, model_name3, train_batch, validation_batch, NUM_EPOCHS=70, lr=1e-4):
 
     num_examples_val = len(val_paths)
     num_examples_train = len(train_paths)
@@ -63,7 +59,7 @@ def train(train_paths, val_paths, model_name1, model_name2, model_name3, NUM_EPO
     save_model(model1, model_name1, history1)
 
     # Generate generalization metrics
-    preds1 = predict(model1, val_dataset, validation_batch, num_examples_val)
+    preds1 = predict(model1, val_dataset, num_examples_val, validation_batch)
     compute_metrics(model_name1, y_true_val, preds1)
 
     # -----------------------------------Model 2 -------------------------------------------------
@@ -87,7 +83,7 @@ def train(train_paths, val_paths, model_name1, model_name2, model_name3, NUM_EPO
     save_model(model2, model_name2, history2)
 
     # Generate generalization metrics
-    preds2 = predict(model2, val_dataset, validation_batch, num_examples_val)
+    preds2 = predict(model2, val_dataset, num_examples_val, validation_batch)
     compute_metrics(model_name2, y_true_val, preds2)
 
     # -----------------------------------Model 3 -------------------------------------------------
@@ -111,7 +107,7 @@ def train(train_paths, val_paths, model_name1, model_name2, model_name3, NUM_EPO
     save_model(model3, model_name3, history3)
 
     # Generate generalization metrics
-    preds3 = predict(model3, val_dataset, validation_batch, num_examples_val)
+    preds3 = predict(model3, val_dataset, num_examples_val, validation_batch)
     compute_metrics(model_name3, y_true_val, preds3)
 
     # -------------------------------------------fuzzy distance ----------------------------------------
@@ -138,6 +134,6 @@ if __name__ == '__main__':
 
   train(train_df, val_df, 
         "InceptionV3" , "MobileNetV2" ,"InceptionResNetV2",
-        NUM_EPOCHS = args.num_epochs, train_batch=args.batch_size,
-        validation_batch = args.batch_size, lr=args.lr)
+        train_batch=args.batch_size, validation_batch = args.batch_size,
+        NUM_EPOCHS = args.num_epochs, lr=args.lr)
   

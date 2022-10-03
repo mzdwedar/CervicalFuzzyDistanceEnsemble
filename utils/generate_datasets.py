@@ -23,7 +23,7 @@ def get_training_dataset(path):
     print("generating training dataset")
 
     uniques = ["NILM" , "ASC-US" , "ASC-H" , "LSIL" , "HSIL", "SCC"]
-    dirs = ["Train" , "Test"]
+    dirs = ["train" , "val"]
     data = {'train':[], 'val':[]}
 
     for dir in dirs :
@@ -34,7 +34,7 @@ def get_training_dataset(path):
                 paths = directory + "/" + filename
                 data[dir].append([paths, unique])
 
-    train_df = pd.DataFrame(data['Train'], columns = ["path", "class"])
+    train_df = pd.DataFrame(data['train'], columns = ["path", "class"])
     val_df = pd.DataFrame(data['val'], columns=["path", "class"])
 
     return train_df, val_df

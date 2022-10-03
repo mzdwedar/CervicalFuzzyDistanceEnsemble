@@ -18,6 +18,7 @@ def normalize(input_image):
   """normalizes the input image pixel values to be [0,1] """
   input_image = tf.cast(input_image, tf.float32)
   input_image /= 255.0
+  
   return input_image
 
 

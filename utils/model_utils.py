@@ -5,8 +5,7 @@ import os
 import pandas as pd
 
 def create_model(model_name,IMG_SIZE = 256, output = 6):
-
-
+    
     IMG_SHAPE = (IMG_SIZE, IMG_SIZE, 3)  # IMG_SIZE = 256
     if(model_name == "MobileNetV2" ):
 
@@ -41,12 +40,11 @@ def save_model(model, model_name, history):
     os.makedirs('saved_models', exist_ok=True)
 
     model_saved_name = model_name + ".h5"
-    
-    model.save("saved_model/" + model_saved_name)
+    model.save("saved_models/" + model_saved_name)
 
     hist_df = pd.DataFrame(history.history) 
     hist_csv_file =  "history_" + model_name + ".csv"
-    filepath = "saved_models/" + hist_csv_file 
+    filepath = "csv_files/" + hist_csv_file 
     with open(filepath, mode='w') as f:
         hist_df.to_csv(f)
 
