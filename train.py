@@ -1,4 +1,5 @@
 import tensorflow as tf 
+from sklearn.metrics import classification_report, accuracy_score
 
 from utils.fuzzy_dist_ensemble import fuzzy_dist 
 from utils.generate_datasets import get_training_dataset
@@ -113,9 +114,9 @@ def train(train_paths, val_paths, model_name1, model_name2, model_name3, train_b
     # -------------------------------------------fuzzy distance ----------------------------------------
     ensem_preds=fuzzy_dist(preds1,preds2,preds3)
     
-
-    compute_metrics('Post Ensemble', y_true_val, ensem_preds)
-
+    print('Accuracy score: ', accuracy_score(y_true_val, ensem_preds))
+    print(classification_report(y_true_val, ensem_preds, digits=4))
+    
 
 if __name__ == '__main__':
 

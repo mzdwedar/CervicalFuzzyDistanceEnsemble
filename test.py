@@ -4,10 +4,10 @@ from utils.generate_datasets import get_testing_dataset
 from utils.fuzzy_dist_ensemble import fuzzy_dist
 from utils.model_utils import load_hdf5_model
 from utils.data_pipeline import *
-from train import compute_metrics, predict
+from utils.model_eval import predict
 
 import tensorflow as tf
-
+from sklearn.metrics import classification_report, accuracy_score
 
 
 def test(test_paths, batch_size):
@@ -40,7 +40,8 @@ def test(test_paths, batch_size):
 
     ensem_preds = fuzzy_dist(preds1, preds2, preds3)    
     
-    compute_metrics(y_true, ensem_preds)
+    print('Accuracy score: ', accuracy_score(y_true, ensem_preds))
+    print(classification_report(y_true, ensem_preds, digits=4))
 
 if __name__ == '__main__':
 
